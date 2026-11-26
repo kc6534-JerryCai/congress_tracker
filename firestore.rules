@@ -1,0 +1,45 @@
+rules_version = '2';
+
+// Data layout: see docs/firestore.md.
+// The backend (Task 2's scheduled job) uses the Firebase Admin SDK, which skips these rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // users/{uid}: each user can read and write only their own profile.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      // users/{uid}/follows/{followId}: followed bills and members.
+      match /follows/{followId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // users/{uid}/notifications/{id}: written by the backend.
+      // The user can read them, mark them read, and delete them, but not create them.
+      match /notifications/{id} {
+        allow read, delete: if isOwner(uid);
+        allow update: if isOwner(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      }
+    }
+
+    // comments/{commentId}: anyone can read; signed-in users post as themselves
+    // and can delete only their own. Comments can't be edited.
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['billId', 'uid', 'displayName', 'text', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.billId is string
+        && request.resource.data.displayName is string
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 2000
+        && request.resource.data.createdAt == request.time;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+  }
+}

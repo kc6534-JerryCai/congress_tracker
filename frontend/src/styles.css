@@ -460,3 +460,31 @@ button:disabled { opacity: 0.4; cursor: default; }
   .data-table { font-size: 0.85rem; }
   .data-table td, .data-table th { padding: 8px 6px; }
 }
+
+/* ---------- Log in / sign up ---------- */
+.auth-card {
+  max-width: 420px; margin: 24px auto; padding: 32px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+}
+.auth-card h1 { margin-top: 0; }
+.auth-form { display: grid; gap: 14px; margin-top: 20px; }
+.auth-form label { display: grid; gap: 6px; font-size: 0.9rem; font-weight: 600; }
+.auth-form label .small { font-weight: 400; }
+.auth-form input { width: 100%; font-weight: 400; }
+.auth-form .error { margin: 0; font-size: 0.9rem; }
+.auth-form button { padding: 10px 12px; font-weight: 600; }
+.auth-divider {
+  display: flex; align-items: center; gap: 12px; margin: 20px 0;
+  color: var(--muted); font-size: 0.85rem;
+}
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+.btn-google { width: 100%; padding: 10px 12px; background: #fff; color: var(--text); border-color: var(--border); font-weight: 600; }
+.btn-google:hover:not(:disabled) { border-color: var(--text); }
+.auth-switch { margin: 20px 0 0; text-align: center; font-size: 0.92rem; }
+
+/* Signed-in state in the header */
+.header-user {
+  align-self: center; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: #fff; font-size: 0.92rem; opacity: 0.9;
+}
+.header-actions button.btn { cursor: pointer; }
