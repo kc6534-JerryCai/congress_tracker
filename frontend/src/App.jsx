@@ -7,6 +7,7 @@ import MembersPage from "./pages/MembersPage.jsx";
 import MemberDetailPage from "./pages/MemberDetailPage.jsx";
 import PlaceholderPage from "./pages/PlaceholderPage.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
+import TrackingPage from "./pages/TrackingPage.jsx";
 
 function PageLayout() {
   return (
@@ -29,10 +30,7 @@ export default function App() {
           <Route path="/bills/:congress/:type/:number" element={<BillDetailPage />} />
           <Route path="/members" element={<MembersPage />} />
           <Route path="/members/:bioguideId" element={<MemberDetailPage />} />
-          <Route
-            path="/tracking"
-            element={<PlaceholderPage title="Tracking" text="Log in to follow bills and members and get notified when they change." />}
-          />
+          <Route path="/tracking" element={<TrackingPage />} />
           <Route path="/login" element={<AuthPage key="login" mode="login" />} />
           <Route path="/signup" element={<AuthPage key="signup" mode="signup" />} />
           <Route

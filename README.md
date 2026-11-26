@@ -50,6 +50,55 @@ To click through the site against the emulators instead of the real project, cre
 `VITE_FIREBASE_PROJECT_ID=demo-capitol-ledger`, `VITE_USE_FIREBASE_EMULATORS=true`,
 then run `npx vite --mode emulator`. The emulator UI at http://127.0.0.1:4000 shows the users and data created.
 
+## Tracking and notifications
+
+Sign in and choose **Follow** on a bill or member page. **Tracking** shows the
+followed items and their latest activity, plus notifications you can mark as
+read. The header updates the unread count as notifications arrive or are read.
+For a member, activity is the most recent legislative action among their 20
+recently sponsored measures, with the introduction date used when a measure
+has no latest action.
+
+The notification worker is a separate, one-shot process. Set `Congress_API`
+and `FIREBASE_PROJECT_ID` in the root `.env` or the job's environment. Use the
+same Firebase project as the frontend. The worker uses Application Default
+Credentials with Firestore read/write access (for example, a runtime service
+account with the `roles/datastore.user` role). If your host requires a
+service-account JSON file, mount it securely and set
+`GOOGLE_APPLICATION_CREDENTIALS` to its absolute path.
+
+Run one check from the repository root:
+
+```bash
+python backend/check_tracking.py
+```
+
+For hourly alerts, configure the same command as an hourly job on the backend
+host. For example, use this crontab entry with paths adjusted for the host:
+
+```cron
+0 * * * * cd /path/to/congress_tracker && /path/to/venv/bin/python backend/check_tracking.py
+```
+
+The worker checks each distinct followed item once per run, writes in-app
+notifications for changes, and advances the saved activity in the same
+Firestore write batch. An unchanged item produces no notification. A failed
+lookup leaves the previous activity in place for the next run.
+
+To point a manual run at the local Firestore emulator (Congress.gov still
+requires an API key):
+
+```bash
+FIREBASE_PROJECT_ID=demo-capitol-ledger FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 python backend/check_tracking.py
+```
+
+With that emulator running, the integration test simulates bill and member
+changes without an API key:
+
+```bash
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 python -m unittest discover -s backend
+```
+
 ## API endpoints
 
 | Endpoint | Description |
@@ -63,7 +112,7 @@ then run `npx vite --mode emulator`. The emulator UI at http://127.0.0.1:4000 sh
 ## Known limitations (prototype)
 
 - The Congress API has no keyword search; `q` only filters the 250 most recently updated bills.
-- Congress API responses are cached in memory; only user data (accounts, follows, comments) is stored in Firestore.
+- Congress API responses are cached in memory; user accounts, follows, notifications, and comments are stored in Firestore.
 - On Windows, `uvicorn --reload` sometimes misses backend changes; restart the backend if a change doesn't show up.
 
 ## Credits
