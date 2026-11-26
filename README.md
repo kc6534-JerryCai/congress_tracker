@@ -23,6 +23,33 @@ FastAPI backend + React (Vite) frontend for browsing U.S. congressional bills an
    ```
 4. Open http://localhost:5173. API docs are at http://localhost:8000/docs.
 
+## Accounts (Firebase)
+
+Log-in and sign-up use Firebase Authentication; user data lives in Firestore.
+The data layout is in [docs/firestore.md](docs/firestore.md) and the security rules in [firestore.rules](firestore.rules).
+
+1. In the [Firebase console](https://console.firebase.google.com), open the team project (or create one), then:
+   - Authentication → Sign-in method: enable **Email/Password** (and **Google** if you want that button to work).
+   - Firestore Database: create a database, then paste `firestore.rules` into the **Rules** tab and publish.
+   - Project settings → Your apps → add a **Web app** and copy its config.
+2. Copy `frontend/.env.example` to `frontend/.env.local` and fill in the `VITE_FIREBASE_*` values. Restart `npm run dev`.
+
+Without `.env.local` the site still runs; the log-in page just says Firebase isn't set up.
+
+### Testing against local emulators
+
+Needs Java 11+ and the Firebase CLI (`npm install -g firebase-tools`).
+
+```bash
+firebase emulators:start --only auth,firestore --project demo-capitol-ledger   # repo root
+cd frontend && npm run test:rules                                              # security-rule tests
+```
+
+To click through the site against the emulators instead of the real project, create
+`frontend/.env.emulator.local` with `VITE_FIREBASE_API_KEY=demo-key`,
+`VITE_FIREBASE_PROJECT_ID=demo-capitol-ledger`, `VITE_USE_FIREBASE_EMULATORS=true`,
+then run `npx vite --mode emulator`. The emulator UI at http://127.0.0.1:4000 shows the users and data created.
+
 ## API endpoints
 
 | Endpoint | Description |
@@ -36,7 +63,7 @@ FastAPI backend + React (Vite) frontend for browsing U.S. congressional bills an
 ## Known limitations (prototype)
 
 - The Congress API has no keyword search; `q` only filters the 250 most recently updated bills.
-- Responses are cached in memory (no database yet).
+- Congress API responses are cached in memory; only user data (accounts, follows, comments) is stored in Firestore.
 - On Windows, `uvicorn --reload` sometimes misses backend changes; restart the backend if a change doesn't show up.
 
 ## Credits

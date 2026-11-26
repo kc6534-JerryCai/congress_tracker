@@ -6,6 +6,7 @@ import BillDetailPage from "./pages/BillDetailPage.jsx";
 import MembersPage from "./pages/MembersPage.jsx";
 import MemberDetailPage from "./pages/MemberDetailPage.jsx";
 import PlaceholderPage from "./pages/PlaceholderPage.jsx";
+import AuthPage from "./pages/AuthPage.jsx";
 
 function PageLayout() {
   return (
@@ -32,10 +33,8 @@ export default function App() {
             path="/tracking"
             element={<PlaceholderPage title="Tracking" text="Log in to follow bills and members and get notified when they change." />}
           />
-          <Route
-            path="/login"
-            element={<PlaceholderPage title="Log in" text="Firebase Authentication is coming soon." />}
-          />
+          <Route path="/login" element={<AuthPage key="login" mode="login" />} />
+          <Route path="/signup" element={<AuthPage key="signup" mode="signup" />} />
           <Route
             path="/subscribe"
             element={<PlaceholderPage title="Subscribe" text="Email updates on the bills you follow are coming soon." />}

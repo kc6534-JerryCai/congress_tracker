@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext.jsx";
 
 export function Logo() {
   return (
@@ -15,6 +16,13 @@ export function Logo() {
  */
 export default function Header({ overlay = false }) {
   const [scrolled, setScrolled] = useState(false);
+  const { user, loading, logOut } = useAuth();
+  const navigate = useNavigate();
+
+  async function onLogOut() {
+    await logOut();
+    navigate("/");
+  }
 
   useEffect(() => {
     if (!overlay) return;
@@ -34,7 +42,15 @@ export default function Header({ overlay = false }) {
           <NavLink to="/tracking">Tracking</NavLink>
         </nav>
         <div className="header-actions">
-          <Link to="/login" className="btn btn-light">Log in</Link>
+          {/* Render nothing for the account slot while Firebase restores the session, so it doesn't flash "Log in". */}
+          {loading ? null : user ? (
+            <>
+              <span className="header-user" title={user.email}>{user.displayName || user.email}</span>
+              <button type="button" className="btn btn-light" onClick={onLogOut}>Log out</button>
+            </>
+          ) : (
+            <Link to="/login" className="btn btn-light">Log in</Link>
+          )}
           <Link to="/subscribe" className="btn btn-dark">Subscribe</Link>
         </div>
       </div>
