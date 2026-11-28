@@ -29,13 +29,16 @@ twice just overwrites, and unfollowing is a single delete.
 | `bioguideId` | string | Members only |
 | `label` | string | What to show on /tracking, e.g. `H.R. 1234` or `Rep. Ro Khanna` |
 | `title` | string | Bill title or member name |
-| `lastSeenUpdateDate` | string | Bill `updateDate` when followed / last checked |
-| `lastSeenAction` | string | Bill `latestAction.text` when followed / last checked |
+| `lastSeenUpdateDate` | string | Congress.gov bill `updateDate`; empty for members |
+| `lastSeenAction` | string | Latest saved bill action or member legislative activity |
+| `lastSeenActionDate` | string | Date of the saved action or introduction |
+| `lastSeenActivityId` | string | For members, the bill ID of the activity (e.g. `119-hr-1234`) |
 | `createdAt` | timestamp | |
 
-The scheduled job compares `lastSeenUpdateDate` / `lastSeenAction` with the
-Congress API. When they differ it writes a notification and updates both fields.
-Only the user can read or write their follows.
+The client saves the current activity when creating a follow. The worker
+compares the saved activity with Congress.gov and uses an atomic batch to update
+the follow and create a notification together. Only the owner can read or
+write their follows from the client.
 
 ## `users/{uid}/notifications/{id}` — update alerts (Task 2)
 

@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { billLabel, useApi } from "../api.js";
+import FollowButton from "../components/FollowButton.jsx";
 
 export default function MemberDetailPage() {
   const { bioguideId } = useParams();
@@ -25,6 +26,18 @@ export default function MemberDetailPage() {
           {m.website && (
             <a href={m.website} target="_blank" rel="noreferrer">Official website ↗</a>
           )}
+          <div className="follow-action">
+            <FollowButton
+              id={`member-${m.bioguideId}`}
+              follow={{
+                kind: "member",
+                bioguideId: m.bioguideId,
+                label: m.name || m.bioguideId,
+                title: m.name || "",
+                ...m.trackingActivity,
+              }}
+            />
+          </div>
         </div>
       </div>
 

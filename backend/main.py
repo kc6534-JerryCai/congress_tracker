@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 import congress_client as cc
+from tracking_activity import member_activity
 
 app = FastAPI(title="Congress Tracker API")
 
@@ -39,7 +40,7 @@ def _bill_summary(b: dict) -> dict:
         "congress": b.get("congress"),
         "type": (b.get("type") or "").lower(),
         "number": b.get("number"),
-        "title": b.get("title"),
+        "title": b.get("title") or b.get("latestTitle"),
         "introducedDate": b.get("introducedDate"),
         "updateDate": b.get("updateDate"),
         "originChamber": b.get("originChamber"),
@@ -324,6 +325,7 @@ async def member_detail(bioguide_id: str):
         ],
         "sponsoredCount": (m.get("sponsoredLegislation") or {}).get("count", 0),
         "cosponsoredCount": (m.get("cosponsoredLegislation") or {}).get("count", 0),
+        "trackingActivity": member_activity(sponsored).follow_fields(),
         # Amendments show up here without a bill type/title; keep only bills.
         "sponsoredBills": [
             _bill_summary(b) for b in sponsored.get("sponsoredLegislation", []) if b.get("type")

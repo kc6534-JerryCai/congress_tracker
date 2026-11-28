@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { query, where } from "firebase/firestore";
 import { useAuth } from "../auth/AuthContext.jsx";
+import { notificationsCollection, useTrackingSnapshot } from "../tracking.js";
 
 export function Logo() {
   return (
@@ -18,6 +20,13 @@ export default function Header({ overlay = false }) {
   const [scrolled, setScrolled] = useState(false);
   const { user, loading, logOut } = useAuth();
   const navigate = useNavigate();
+  const uid = user?.uid;
+  const unread = useMemo(
+    () => uid ? query(notificationsCollection(uid), where("read", "==", false)) : null,
+    [uid]
+  );
+  const { snapshot } = useTrackingSnapshot(unread);
+  const count = snapshot?.size || 0;
 
   async function onLogOut() {
     await logOut();
@@ -39,7 +48,14 @@ export default function Header({ overlay = false }) {
         <nav className="main-nav">
           <NavLink to="/bills">Bills</NavLink>
           <NavLink to="/members">Members</NavLink>
-          <NavLink to="/tracking">Tracking</NavLink>
+          <NavLink
+            to="/tracking"
+            className={({ isActive }) => `tracking-nav${isActive ? " active" : ""}`}
+            aria-label={count > 0 ? `Tracking, ${count} unread notifications` : undefined}
+          >
+            Tracking
+            {count > 0 && <span className="unread-count" aria-hidden="true">{count}</span>}
+          </NavLink>
         </nav>
         <div className="header-actions">
           {/* Render nothing for the account slot while Firebase restores the session, so it doesn't flash "Log in". */}

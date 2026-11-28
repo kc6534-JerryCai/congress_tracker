@@ -488,3 +488,14 @@ button:disabled { opacity: 0.4; cursor: default; }
   color: #fff; font-size: 0.92rem; opacity: 0.9;
 }
 .header-actions button.btn { cursor: pointer; }
+
+/* ---------- Tracking ---------- */
+.tracking-nav, .follow-action { display: flex; align-items: center; gap: 8px; }
+.follow-action { margin-block: 12px; flex-wrap: wrap; }
+.unread-count {
+  min-width: 1.5em; padding: 1px 6px; border-radius: 999px;
+  background: #dbe9ff; color: #173865; font-size: 0.8rem; text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.tracking-card { padding: 14px 16px; }
+.tracking-card p { margin: 8px 0; overflow-wrap: anywhere; }

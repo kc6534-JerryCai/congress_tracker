@@ -1,5 +1,6 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { billLabel, formatDate, splitMemberName, useApi } from "../api.js";
+import FollowButton from "../components/FollowButton.jsx";
 
 const CHAMBER_NOUN = { hr: "House bill", s: "Senate bill", hres: "House resolution", sres: "Senate resolution" };
 
@@ -30,6 +31,7 @@ export default function BillDetailPage() {
   const sponsor = bill.sponsors[0];
   const sponsorName = sponsor && splitMemberName(sponsor.fullName);
   const cosponsors = bill.counts.cosponsors;
+  const billId = `${bill.congress}-${bill.type}-${bill.number}`;
 
   return (
     <article className="bill-page">
@@ -45,6 +47,20 @@ export default function BillDetailPage() {
           {CHAMBER_NOUN[bill.type] || `${bill.originChamber} measure`}
         </p>
         <h1 className="bill-title">{bill.title}</h1>
+        <div className="follow-action">
+          <FollowButton
+            id={`bill-${billId}`}
+            follow={{
+              kind: "bill",
+              billId,
+              label: billLabel(bill),
+              title: bill.title || "",
+              lastSeenUpdateDate: bill.updateDate || "",
+              lastSeenAction: bill.latestAction?.text || "",
+              lastSeenActionDate: bill.latestAction?.actionDate || "",
+            }}
+          />
+        </div>
 
         {sponsor && (
           <div className="byline">
